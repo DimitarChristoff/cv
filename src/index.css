@@ -1,0 +1,107 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+@media print {
+  .MuiChip-filled.MuiChip-colorDefault {
+    background-color: #aaa !important;
+    color: white !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .MuiCard-root {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+  .MuiCard-root > div {
+    padding: 0 !important;
+  }
+  #career {
+    margin-bottom: 1rem;
+  }
+  .main {
+    margin-top: 0 !important;
+    color: black !important;
+    margin-bottom: 80px;
+  }
+  .main .MuiTypography-root {
+    color: black !important;
+  }
+  .scroll {
+    overflow: auto;
+    position: relative !important;
+  }
+  body {
+    overflow: initial !important;
+  }
+}
+
+.print-only {
+  display: none;
+}
+
+.see-through {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.scroll {
+  overflow-y: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 70px;
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
+}
+
+.main {
+  position: relative;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(30,30,30,.72);
+  border-radius: 10px;
+  opacity: 0.6;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30,30,30,.9);
+  opacity: 1;
+}
+
+
+.MuiChip-sizeSmall {
+  height: auto !important;
+}
+.MuiChip-sizeSmall + .MuiChip-sizeSmall {
+  margin-left: 2px;
+}
+
+/*.personal {*/
+/*  background: url("assets/bg.svg");*/
+/*  backdrop-filter: blur(3);*/
+/*}*/
+
+.MuiPaper-rounded:hover {
+  background: rgba(40,40,40,.72);
+}
