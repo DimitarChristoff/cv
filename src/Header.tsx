@@ -8,7 +8,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import Container from '@mui/material/Container'
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
-import { Divider, SwipeableDrawer, List, ListItem, ListItemButton, ListItemText } from '@mui/material'
+import { SwipeableDrawer, List, ListItem, ListItemButton, ListItemText } from '@mui/material'
 
 import LinearProgress from '@mui/material/LinearProgress'
 import dimi from './assets/img.png'
@@ -35,7 +35,7 @@ const Header = ({ scrolled }) => {
     }
   }, [])
 
-  const handleOpenNavMenu = (event) => {
+  const handleOpenNavMenu = () => {
     setMobileMenuOpen((prev) => !prev)
   }
 
@@ -53,10 +53,6 @@ const Header = ({ scrolled }) => {
     }, 500)
   }
 
-  const handleMenuNav = (event) => {
-    document.location.href = `#${event.target.dataset.id}`
-  }
-
   const drawer = (
     <Box sx={{ textAlign: 'center' }}>
       <List>
@@ -71,7 +67,7 @@ const Header = ({ scrolled }) => {
     </Box>
   )
 
-  const container = document.body
+  // const container = document.body
 
   return (
     <AppBar component="nav" position={'fixed'} elevation={2} className={'no-print see-through'} color={'transparent'}>
@@ -159,4 +155,5 @@ const Header = ({ scrolled }) => {
     </AppBar>
   )
 }
+
 export default Header

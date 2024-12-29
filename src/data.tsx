@@ -4,25 +4,36 @@ import { Link } from '@mui/material'
 
 export const jobs: JobType[] = [
   {
+    client: 'Market Axess',
+    role: 'Lead Software Engineer',
+    location: 'London',
+    from: 'Jun 2024',
+    until: 'date',
+    description: 'Working as Lead on the platform team for MarketAxess',
+  },
+
+  {
     client: 'Norman & Sons',
     role: 'JavaScript Consultant',
     location: 'London',
     from: 'Jan 2020',
-    until: 'date',
+    until: 'May 2024',
     description: 'Working for a number of N&S clients within finance',
     jobs: [
       {
-        client: 'HSBC Equities / GBM, Falcon',
+        client: 'HSBC Fixed Income / GDM, Falcon',
         from: 'Sep 2021',
         until: 'date',
-        description: `Senior Developer in a team, working on 4 different trading and pricing apps within the Equities space.
+        description: `Lead Front-end Developer on all Fixed Income risk apps (credit and rates), one of 5 UI platform
+                  team devs / approvers in a repository of over 200 contributors. Previously, Senior Developer in a team
+                  focused on 4 different trading and pricing apps within the Fixed Income space.
                   Created a "Spotlight" style command-line utility that enables traders to quickly create new CDS, IRS,
                   TRS or Bond based trades with Swagger, NLP and machine learning. Created a Trade Finder and a Bond
                   Position Finder (blotter like apps) with FDC3-based intents, allowing for results to be de-risked,
                   priced or inspected by other applications. Created an application discovery channel protocol, allowing
-                  cross-application data flows. Committed to the Falcon Core platform and became a core member. Created
-                  a new modern dark/light theme for all apps. This role required work with POs, traders, UX, designers
-                  and quants. Tech: React, Typescript, canvas, CSS Next, LESS, react-testing-library+Jest`,
+                  cross-application data flows. Created a new modern dark/light theme for all apps. This role required
+                  work with POs, traders, UX / designers and quants.
+                  Tech: React, Typescript, canvas, CSS Next, LESS, react-testing-library+Jest`,
       },
       {
         client: 'GenesisGlobal',
