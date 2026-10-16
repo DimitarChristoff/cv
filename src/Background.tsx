@@ -357,7 +357,7 @@ const Background = ({ theme }: Props) => {
       river.uniforms.uFade.value = fade
       streaks.uniforms.uTime.value = time
       streaks.uniforms.uScroll.value = scroll
-      streaks.uniforms.uIntensity.value = current.streakAlpha * (0.6 + 0.4 * fade)
+      streaks.uniforms.uIntensity.value = current.streakAlpha * (0.35 + 0.65 * fade)
       renderer.render(scene, camera)
     }
 

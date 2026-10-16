@@ -28,3 +28,12 @@ export const formatPeriod = (from: string, until: string) =>
   `${from.trim()} — ${isPresent(until) ? 'Present' : until.trim()}`
 
 export const yearOf = (value: string) => Math.floor(toMonthIndex(value) / 12)
+
+// Jun — Sep 2016 rather than Jun 2016 — Sep 2016, for the compact earlier-stops board
+export const formatPeriodShort = (from: string, until: string) => {
+  const [fromMonth, fromYear] = from.trim().split(/\s+/)
+  const [untilMonth, untilYear] = until.trim().split(/\s+/)
+  return !isPresent(until) && fromYear === untilYear
+    ? `${fromMonth} — ${untilMonth} ${untilYear}`
+    : formatPeriod(from, until)
+}

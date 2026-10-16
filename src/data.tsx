@@ -2,8 +2,7 @@ import { Award, EducationType, JobType, SkillGroup } from './types'
 
 export const jobs: JobType[] = [
   {
-    client: 'Market Axess',
-    short: 'MarketAxess',
+    client: 'MarketAxess',
     role: 'Lead Software Engineer',
     location: 'London',
     from: 'Jun 2024',
@@ -35,8 +34,8 @@ export const jobs: JobType[] = [
                   Position Finder (blotter like apps) with FDC3-based intents, allowing for results to be de-risked,
                   priced or inspected by other applications. Created an application discovery channel protocol, allowing
                   cross-application data flows. Created a new modern dark/light theme for all apps. This role required
-                  work with POs, traders, UX / designers and quants.
-                  Tech: React, Typescript, canvas, CSS Next, LESS, react-testing-library+Jest`,
+                  work with POs, traders, UX / designers and quants.`,
+        tech: ['React', 'Typescript', 'canvas', 'CSS Next', 'LESS', 'react-testing-library', 'Jest'],
       },
       {
         client: 'GenesisGlobal',
@@ -52,11 +51,11 @@ export const jobs: JobType[] = [
             <a className="link" href="https://www.normanandsons.com/videos/IKZEOKR9YA.mp4">
               generated JSX code and managed projects
             </a>{' '}
-            in a WYSIWYG manner. Also used: BlueprintJs, react-flow, react-beautiful-dnd, styled-components, CSSNext,
-            SCSS. Both server and client counterpart apps were completed within 6 months to a MVP standard to help
-            Genesis offer low/no code solutions for server and client spaces.
+            in a WYSIWYG manner. Both server and client counterpart apps were completed within 6 months to a MVP
+            standard to help Genesis offer low/no code solutions for server and client spaces.
           </>
         ),
+        tech: ['BlueprintJs', 'react-flow', 'react-beautiful-dnd', 'styled-components', 'CSSNext', 'SCSS'],
       },
 
       {
@@ -71,9 +70,10 @@ export const jobs: JobType[] = [
             architecture and proceeded to create shared styles for light and dark theme, update the apps and integrate
             them within Finsemble Electron binaries. Liaised with the UX/design team to deliver the best user experience
             possible with the least amount of friction for dev teams in terms of effort, code and changes in existing
-            practices. Utilised React, CSSNext, Angular, Finsemble, ag-grid, devxtreme, Bootstrap.
+            practices.
           </>
         ),
+        tech: ['React', 'CSSNext', 'Angular', 'Finsemble', 'ag-grid', 'devxtreme', 'Bootstrap'],
       },
     ],
   },
@@ -85,9 +85,19 @@ export const jobs: JobType[] = [
     from: 'Jun 2019',
     until: 'Dec 2019',
     description: `JavaScript developer / architect on a new Greenfield project for trade intelligence in the space of Bloomberg
-          and Refinitiv. Delivered a MVP in record time, unifying data from multiple APIs on top of a GraphQL layer,
-          using React + hooks, apollo-graphql, MobX, Bulma, ECharts, Slickgrid, KeyCloak, Cypress, testing-library.
+          and Refinitiv. Delivered a MVP in record time, unifying data from multiple APIs on top of a GraphQL layer.
           DevOps via Bamboo / k8s / AWS`,
+    tech: [
+      'React + hooks',
+      'apollo-graphql',
+      'MobX',
+      'Bulma',
+      'ECharts',
+      'Slickgrid',
+      'KeyCloak',
+      'Cypress',
+      'testing-library',
+    ],
   },
   {
     client: 'NatWest Markets',
@@ -96,9 +106,26 @@ export const jobs: JobType[] = [
     until: 'Apr 2019',
     location: 'London',
     description: `JavaScript developer on a project allowing all RBS and NatWest corporate / business users to make
-        international currency transfers on the back of the NatWest Markets FX rates platform. Utilising React,
-        Babel, Lerna, Webpack, ES7, Jest, Enzyme, Redux, Bulma, SCSS / modules, GCP, GitLab CI, Docker, HELM, Google
-        SSO, PingFed, DAON and more`,
+        international currency transfers on the back of the NatWest Markets FX rates platform.`,
+    tech: [
+      'React',
+      'Babel',
+      'Lerna',
+      'Webpack',
+      'ES7',
+      'Jest',
+      'Enzyme',
+      'Redux',
+      'Bulma',
+      'SCSS / modules',
+      'GCP',
+      'GitLab CI',
+      'Docker',
+      'HELM',
+      'Google SSO',
+      'PingFed',
+      'DAON and more',
+    ],
     jobs: [
       {
         description: `Created a brand new responsive React component library for the whole project based upon Bulma and
@@ -120,7 +147,8 @@ export const jobs: JobType[] = [
     from: 'Sep 2016',
     until: 'Feb 2018',
     location: 'London',
-    description: `Part of Platform Services under DES, responsible for architecture, development and support of in-house Web Component library development, using React, Babel, Webpack, ES6, PostCSS, CSSNext, Jest, Enzyme`,
+    description: `Part of Platform Services under DES, responsible for architecture, development and support of in-house Web Component library development`,
+    tech: ['React', 'Babel', 'Webpack', 'ES6', 'PostCSS', 'CSSNext', 'Jest', 'Enzyme'],
     jobs: [
       {
         description: `Ulster Bank - GreenBank API Portal application, complete development and UI codebase, using React, Babel, Webpack, ES6, SCSS, mobx, redux`,

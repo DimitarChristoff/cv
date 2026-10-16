@@ -7,6 +7,8 @@ export type SubJob = {
   from?: string
   until?: string
   description: ReactNode
+  // the stack, shown as its own mono line under the description
+  tech?: string[]
 }
 
 export type JobType = {
@@ -17,6 +19,7 @@ export type JobType = {
   from: string
   until: string
   description?: ReactNode
+  tech?: string[]
   jobs?: SubJob[]
 }
 

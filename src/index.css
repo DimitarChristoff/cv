@@ -926,45 +926,54 @@ button.chip:hover {
 .section {
   width: var(--page);
   margin-inline: auto;
-  padding-top: clamp(80px, 11vw, 150px);
+  padding-top: clamp(80px, 9vw, 120px);
 }
 
 .section__head {
+  position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 16px;
-  margin-bottom: clamp(32px, 5vw, 56px);
+  gap: 8px 22px;
+  padding-bottom: 18px;
+  margin-bottom: 56px;
 }
 
-.section__index {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  color: var(--accent-ink);
-}
-
-.section__title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 58px);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-}
-
-.section__rule {
-  flex: 1;
-  align-self: center;
+/* the rule under each heading draws itself in when the heading arrives */
+.section__head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   height: 1px;
   background: var(--line-strong);
   transform-origin: 0 50%;
 }
 
+.section__index {
+  font-family: var(--font-board);
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--accent-display);
+}
+
+.section__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 4.4vw, 60px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
 .section__aside {
+  margin-left: auto;
   font-family: var(--font-mono);
   font-size: 12px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-faint);
 }
@@ -972,24 +981,29 @@ button.chip:hover {
 /* --- career route -------------------------------------------------------- */
 
 .route {
-  --when: 168px;
-  --rail: 44px;
+  --date: 180px;
+  --rail: 28px;
+  --gap: 24px;
   position: relative;
 }
 
+/* one line through every stop's node, fading out where the route hands over to the board */
 .route__rail {
   position: absolute;
-  top: 8px;
+  top: 19px;
   bottom: 0;
-  left: calc(var(--when) + var(--rail) / 2);
-  width: 1px;
-  background: var(--line-strong);
+  left: calc(var(--date) + var(--gap) + var(--rail) / 2 - 1px);
+  width: 2px;
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+  -webkit-mask-image: linear-gradient(#000 80%, transparent);
+  mask-image: linear-gradient(#000 80%, transparent);
 }
 
 .route__fill {
   position: absolute;
-  inset: 0 -0.5px;
+  inset: 0;
   background: var(--accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--streak) 45%, transparent);
   transform: scaleY(0);
   transform-origin: top;
 }
@@ -1002,121 +1016,332 @@ button.chip:hover {
 
 .stop {
   display: grid;
-  grid-template-columns: var(--when) var(--rail) minmax(0, 1fr);
-  padding-bottom: clamp(24px, 3.5vw, 40px);
+  grid-template-columns: var(--date) var(--rail) minmax(0, 1fr);
+  grid-template-areas: 'date rail body';
+  column-gap: var(--gap);
 }
 
 .stop__when {
-  padding-top: 24px;
+  grid-area: date;
+  padding-top: 12px;
   text-align: right;
   font-family: var(--font-mono);
   font-size: 12px;
-  line-height: 1.6;
-  letter-spacing: 0.05em;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--ink);
 }
 
 .stop__duration {
   display: block;
+  margin-top: 4px;
   color: var(--ink-faint);
 }
 
-.stop__dot {
+/* past stops are hollow rings that warm to amber as the route passes them; the current one is lit */
+.stop__node {
+  grid-area: rail;
   position: relative;
   z-index: 1;
   justify-self: center;
-  width: 11px;
-  height: 11px;
-  margin-top: 28px;
-  border: 1.5px solid var(--line-strong);
+  width: 14px;
+  height: 14px;
+  margin-top: 12px;
   border-radius: 50%;
   background: var(--bg);
-  transition: border-color 0.4s ease, background-color 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: inset 0 0 0 2px var(--ink), 0 0 0 4px var(--bg);
+  transition: box-shadow 0.5s ease, background-color 0.6s ease;
 }
 
-.stop__dot.is-passed {
-  border-color: var(--accent);
+.stop__node.is-passed {
+  box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 4px var(--bg),
+    0 0 12px 2px color-mix(in srgb, var(--streak) 35%, transparent);
+}
+
+.stop__node--current,
+.stop__node--current.is-passed {
   background: var(--accent);
-  box-shadow: 0 0 0 5px var(--accent-wash);
+  box-shadow: 0 0 0 4px var(--bg), 0 0 14px 4px color-mix(in srgb, var(--streak) 40%, transparent);
 }
 
-.stop__card {
-  padding: clamp(20px, 2.4vw, 28px) clamp(20px, 2.6vw, 32px);
+.stop__body {
+  grid-area: body;
+  min-width: 0;
+  padding-bottom: 64px;
 }
 
 .stop__client {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(24px, 2.5vw, 32px);
+  font-size: 36px;
   font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-}
-
-.stop__role {
-  margin: 6px 0 0;
-  font-size: 15px;
-  color: var(--ink-soft);
-}
-
-.stop__role strong {
-  font-weight: 600;
+  line-height: 1.1;
   color: var(--ink);
 }
 
+.stop__role {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--accent-ink);
+}
+
+.stop__role span {
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+
 .stop__desc,
-.sub p {
-  max-width: 74ch;
-  margin: 14px 0 0;
-  font-size: 15.5px;
-  color: var(--ink-soft);
+.change__desc,
+.duties li {
+  max-width: 68ch;
+  font-size: 16px;
+  line-height: 1.75;
+  color: var(--ink-body);
 }
 
-.subs {
+.stop__desc {
   margin: 18px 0 0;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--line);
 }
 
-.sub {
-  position: relative;
-  padding: 16px 0 0 20px;
-}
-
-.sub::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 25px;
-  width: 7px;
-  height: 7px;
-  border: 1.5px solid var(--accent);
-  border-radius: 50%;
-}
-
-.sub__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 2px 12px;
-}
-
-.sub__client {
-  font-weight: 600;
-}
-
-.sub__period {
+.tech {
+  /* ch would be measured without the letter-spacing, so cap it in pixels */
+  max-width: 680px;
+  margin: 10px 0 0;
   font-family: var(--font-mono);
-  font-size: 11.5px;
-  letter-spacing: 0.05em;
+  font-size: 12px;
+  line-height: 1.7;
+  letter-spacing: 0.06em;
+  color: var(--accent-ink);
+}
+
+/* clients of a consultancy hang off the line like an interchange */
+.change-label {
+  margin: 32px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--ink-faint);
 }
 
-.sub__head + p {
-  margin-top: 6px;
+.changes {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  margin: 10px 0 0;
+  padding: 0 0 0 24px;
+  border-left: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  list-style: none;
+}
+
+.change {
+  position: relative;
+}
+
+.change::before {
+  content: '';
+  position: absolute;
+  left: -24px;
+  top: 15px;
+  width: 14px;
+  height: 1px;
+  background: color-mix(in srgb, var(--ink) 40%, transparent);
+}
+
+.change__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+
+.change__client {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.change__period {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.change__desc {
+  margin: 0;
+}
+
+.change__head + .change__desc {
+  margin-top: 12px;
+}
+
+.duties {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 68ch;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.duties li {
+  display: flex;
+  gap: 14px;
+}
+
+.duties li::before {
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 1.5px;
+  margin-top: 13px;
+  background: var(--accent-display);
+}
+
+/* earlier stops: a departure board whose rows open up */
+.earlier {
+  margin-left: calc(var(--date, 180px) + 24px + 28px);
+  padding-top: 18px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.earlier__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.earlier__more {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--accent-ink);
+}
+
+.earlier__rows {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.earlier__row {
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.earlier__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 18px;
+  min-height: 56px;
+  padding-block: 6px;
+}
+
+.earlier__year {
+  width: 64px;
+  font-family: var(--font-board);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--accent-ink);
+}
+
+.earlier__name {
+  flex: 0 1 220px;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.earlier__role {
+  flex: 1 1 260px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.earlier__dates {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.earlier__toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.earlier__toggle:hover,
+.earlier__row.is-open .earlier__toggle {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+
+.earlier__toggle svg {
+  transition: transform 0.35s var(--ease);
+}
+
+.earlier__row.is-open .earlier__toggle svg {
+  transform: rotate(45deg);
+}
+
+.earlier__details {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows 0.45s var(--ease), visibility 0s linear 0.45s;
+}
+
+.earlier__row.is-open .earlier__details {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.earlier__details > div {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.earlier__body {
+  padding: 2px 62px 28px 82px;
+}
+
+.earlier__meta {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.earlier__body .stop__desc {
+  margin-top: 12px;
 }
 
 /* --- skills -------------------------------------------------------------- */
@@ -1454,12 +1679,12 @@ button.chip:hover {
   transform: none;
 }
 
-.js .section__head .section__rule {
+.js .section__head::after {
   transform: scaleX(0);
   transition: transform 1.4s var(--ease) 0.15s;
 }
 
-.js .section__head.in .section__rule {
+.js .section__head.in::after {
   transform: scaleX(1);
 }
 
@@ -1652,45 +1877,128 @@ button.chip:hover {
     display: none;
   }
 
-  .section__aside {
-    display: none;
+  .section__head {
+    gap: 8px 14px;
+    padding-bottom: 14px;
+    margin-bottom: 36px;
   }
 
-  /* the route collapses to a rail on the left with dates above each card */
+  .section__index {
+    font-size: 30px;
+  }
+
+  .section__title {
+    font-size: 40px;
+  }
+
+  .section__aside {
+    font-size: 10px;
+  }
+
+  /* the route collapses to a rail on the left with the dates above each stop */
   .route {
-    --rail: 24px;
+    --date: 0px;
+    --gap: 14px;
   }
 
   .route__rail {
-    left: calc(var(--rail) / 2);
+    left: 13px;
   }
 
   .stop {
     grid-template-columns: var(--rail) minmax(0, 1fr);
     grid-template-areas:
-      'dot when'
-      'dot card';
-    column-gap: 12px;
+      'rail date'
+      'rail body';
   }
 
-  .stop__dot {
-    grid-area: dot;
-    margin-top: 6px;
+  .stop__node {
+    grid-row: 1 / span 2;
+    margin-top: 4px;
   }
 
   .stop__when {
-    grid-area: when;
-    padding: 0 0 10px;
+    padding-top: 4px;
+    font-size: 11px;
     text-align: left;
   }
 
   .stop__duration {
     display: inline;
-    margin-left: 10px;
+    margin: 0;
   }
 
-  .stop__card {
-    grid-area: card;
+  .stop__duration::before {
+    content: ' · ';
+  }
+
+  .stop__body {
+    padding-bottom: 48px;
+  }
+
+  .stop__client {
+    margin-top: 10px;
+    font-size: 30px;
+  }
+
+  .changes {
+    gap: 28px;
+    padding-left: 16px;
+  }
+
+  .change::before {
+    left: -16px;
+    top: 13px;
+    width: 10px;
+  }
+
+  .change__client {
+    font-size: 19px;
+  }
+
+  .earlier {
+    margin-left: 0;
+  }
+
+  /* each row becomes year | name over role and dates, with the toggle held at the right */
+  .earlier__line {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) 44px;
+    grid-template-areas:
+      'year name toggle'
+      '. role toggle'
+      '. dates toggle';
+    gap: 2px 14px;
+    padding-block: 12px;
+  }
+
+  .earlier__year {
+    grid-area: year;
+    width: auto;
+    font-size: 20px;
+  }
+
+  .earlier__name {
+    grid-area: name;
+    font-size: 19px;
+  }
+
+  .earlier__role {
+    grid-area: role;
+  }
+
+  .earlier__dates {
+    grid-area: dates;
+    font-size: 11px;
+  }
+
+  .earlier__toggle {
+    grid-area: toggle;
+    align-self: center;
+  }
+
+  .earlier__body {
+    padding: 0 0 24px 70px;
   }
 
   .skills__grid,
@@ -1772,7 +2080,7 @@ button.chip:hover {
     transform: none !important;
   }
 
-  .js .section__head .section__rule {
+  .js .section__head::after {
     transform: none;
   }
 
@@ -1794,13 +2102,15 @@ button.chip:hover {
   }
 
   .route__rail,
-  .stop__dot {
+  .stop__node,
+  .earlier__toggle {
     display: none;
   }
 
   .stop {
     grid-template-columns: 130px minmax(0, 1fr);
-    break-inside: avoid;
+    grid-template-areas: 'date body';
+    column-gap: 16px;
   }
 
   .stop__when {
@@ -1808,7 +2118,28 @@ button.chip:hover {
     text-align: left;
   }
 
-  .stop__card,
+  .stop__body {
+    padding-bottom: 20px;
+  }
+
+  .change {
+    break-inside: avoid;
+  }
+
+  /* on paper every earlier stop is printed open */
+  .earlier {
+    margin-left: 0;
+  }
+
+  .earlier__details {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+
+  .earlier__body {
+    padding: 0 0 12px;
+  }
+
   .edu__item,
   .personal__block,
   .skill-group {
