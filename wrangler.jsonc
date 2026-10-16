@@ -2,11 +2,15 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "cv",
   "compatibility_date": "2026-10-12",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "fragged.org/cv*", "zone_name": "fragged.org" },
+    { "pattern": "www.fragged.org/cv*", "zone_name": "fragged.org" }
+  ],
   "build": {
     "command": "npm run build"
   },
   "assets": {
-    "directory": "./cv",
-    "not_found_handling": "single-page-application"
+    "directory": "./dist"
   }
 }
