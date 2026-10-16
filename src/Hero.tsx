@@ -126,11 +126,6 @@ const Hero = () => {
         </div>
 
         <div className="hero__foot">
-          {/* the "TOURIST S'GERMAIN" plank floating on the river */}
-          <span className="plank" aria-hidden="true">
-            <span>{profile.first.toUpperCase()}</span>
-            <span>{profile.last.toUpperCase()}</span>
-          </span>
           <a className="hero__cue no-print" href="#career">
             Scroll
           </a>
