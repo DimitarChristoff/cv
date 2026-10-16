@@ -9,7 +9,7 @@ type SubJobsProps = {
 
 const MOBILE_FONT_SIZE = '16px'
 
-export const getJobDuration = (from, until) => {
+export const getJobDuration = (from: string | Date, until: string | Date) => {
   const fromD = moment(from, 'MMM YYYY')
   const untilD = until === 'date' ? moment(new Date()) : moment(until, 'MMM YYYY').endOf('month')
   return untilD.diff(fromD, 'months')
@@ -69,9 +69,16 @@ type JobProps = {
   noSnap: boolean
 }
 
-export const Job: FC<JobProps> = ({ client, from, until, role, location, description, jobs, noSnap }) => {
+export const Job: FC<JobProps> = ({ client, from, until, role, location, description, jobs, noSnap = true }) => {
   return (
-    <Card sx={{ marginBottom: 2, padding: 0, scrollSnapAlign: noSnap ? 'initial' : 'start' }}>
+    <Card
+      sx={{
+        marginBottom: 2,
+        padding: 0,
+        scrollSnapAlign: noSnap ? 'none' : 'start',
+        scrollSnapStop: 'always',
+        scrollPaddingTop: 150,
+      }}>
       <CardHeader
         title={client}
         subheader={

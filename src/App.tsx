@@ -75,7 +75,7 @@ function App() {
             Dimitar Christoff
           </Typography>
         </Box>
-        <Box style={{ transform: 'translateY(-20px)' }}>
+        <Box style={{ transform: 'translateY(-20px)' }} id={'start'}>
           <Grid container columnSpacing={2}>
             <Grid item xs={12} md={6}>
               <Box sx={{ marginTop: 2 }}>
@@ -161,7 +161,7 @@ function App() {
                 until={job.until}
                 jobs={job.jobs}
                 description={job.description}
-                noSnap={index === 0}
+                noSnap={true || index === 0}
               />
             ))}
           </TabPanel>

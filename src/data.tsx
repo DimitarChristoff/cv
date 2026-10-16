@@ -9,7 +9,9 @@ export const jobs: JobType[] = [
     location: 'London',
     from: 'Jun 2024',
     until: 'date',
-    description: 'Working as Lead on the platform team for MarketAxess',
+    description: `Working as Lead on the platform team for MarketAxess. Huge monorepo running platform as a service on top of: pnpm,
+    TypesScript, rtk, node, GraphQL, Yoga, Tailwind, ShadCN, ag-grid, MicroFrontends and much more. Responsible for helping build the
+    next generation of platform for the Market Axess trading platform`,
   },
 
   {
