@@ -1,7 +1,21 @@
 import { useEffect, useRef } from 'react'
-import { Mesh, PerspectiveCamera, PlaneGeometry, Scene, ShaderMaterial, Vector3, WebGLRenderer } from 'three'
+import {
+  Mesh,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  ShaderMaterial,
+  Vector2,
+  Vector3,
+  Vector4,
+  WebGLRenderer,
+} from 'three'
 import { prefersReducedMotion } from './scroll'
 import type { ThemeId } from './useTheme'
+
+// how many pointer blooms can be alive on the water at once, and how long each lasts
+const BLOOMS = 12
+const BLOOM_LIFE = 1.8
 
 const NOISE = /* glsl */ `
   float hash(vec2 p) {
@@ -52,9 +66,10 @@ const MIST_FRAGMENT = /* glsl */ `
     float n = fbm(p * 1.4 + vec2(drift, uScroll * 0.08));
     float n2 = fbm(p * 3.1 + vec2(-drift * 1.6, uScroll * 0.05 + 3.0));
     float mist = smoothstep(0.38, 0.82, n * 0.7 + n2 * 0.3);
-    // the mist gathers along the horizon, like fog sitting on the river
+    // the mist gathers along the horizon and lies heavy on the river below it
     float horizon = exp(-pow((vUv.y - uHorizon) / 0.14, 2.0));
-    float amount = clamp(mist * 0.7 + horizon * 0.55, 0.0, 1.0) * uFog;
+    float river = smoothstep(uHorizon, uHorizon - 0.3, vUv.y) * 0.45;
+    float amount = clamp(mist * 0.6 + horizon * 0.55 + river, 0.0, 1.0) * uFog;
     vec3 col = mix(uBg, uMist, amount);
     // wash the edges out to the paper colour, like an over-exposed print
     float edge = smoothstep(0.35, 0.95, length((vUv - vec2(0.5, 0.55)) * vec2(1.1, 1.3)));
@@ -63,13 +78,14 @@ const MIST_FRAGMENT = /* glsl */ `
   }
 `
 
-const GRID_VERTEX = /* glsl */ `
+const RIVER_VERTEX = /* glsl */ `
   uniform float uTime;
   varying vec3 vWorld;
   varying float vDepth;
   void main() {
     vec3 p = position;
-    p.y += sin(p.x * 0.18 + uTime * 0.35) * 0.22 + sin(p.z * 0.23 - uTime * 0.27) * 0.18 + sin((p.x + p.z) * 0.11 + uTime * 0.2) * 0.15;
+    // a slow swell, like water under fog
+    p.y += sin(p.x * 0.21 + uTime * 0.32) * 0.14 + sin(p.z * 0.37 - uTime * 0.41) * 0.12 + sin((p.x + p.z) * 0.13 + uTime * 0.2) * 0.1;
     vec4 world = modelMatrix * vec4(p, 1.0);
     vec4 view = viewMatrix * world;
     vWorld = world.xyz;
@@ -78,34 +94,53 @@ const GRID_VERTEX = /* glsl */ `
   }
 `
 
-const GRID_FRAGMENT = /* glsl */ `
+const RIVER_FRAGMENT = /* glsl */ `
+  #define BLOOMS ${BLOOMS}
+  #define LIFE ${BLOOM_LIFE.toFixed(2)}
   uniform vec3 uGrid;
   uniform vec3 uStreak;
   uniform float uAlpha;
+  uniform float uFade;
   uniform float uScroll;
   uniform float uTime;
+  // xy: position on the water (flow space), z: age in seconds, w: strength (0 = unused)
+  uniform vec4 uBlooms[BLOOMS];
   varying vec3 vWorld;
   varying float vDepth;
+  ${NOISE}
 
-  // screen space anti-aliased lines, faded out where cells get smaller than a few pixels to avoid moire
-  float lines(vec2 c, float width) {
-    vec2 d = fwidth(c);
-    vec2 g = abs(fract(c - 0.5) - 0.5) / (d * width);
-    float l = 1.0 - min(min(g.x, g.y), 1.0);
-    return l * (1.0 - smoothstep(0.15, 0.6, max(d.x, d.y)));
+  // screen space anti-aliased horizontal lines, faded out where they crowd together towards the horizon
+  float scanline(float c) {
+    float d = fwidth(c);
+    float g = abs(fract(c - 0.5) - 0.5) / d;
+    return (1.0 - min(g, 1.0)) * (1.0 - smoothstep(0.2, 0.7, d));
   }
 
   void main() {
-    // offset half a cell so no line sits dead centre, where it would draw straight down the page
-    vec2 c = vec2(vWorld.x + 0.5, vWorld.z - uScroll * 7.0);
-    float minor = lines(c, 1.0);
-    float major = lines(c / 4.0, 1.4);
-    float fog = 1.0 - smoothstep(10.0, 70.0, vDepth);
-    float near = smoothstep(0.8, 4.0, vDepth);
-    // a slow amber pulse running along the major lines, like a platform sign lighting up
-    float pulse = pow(0.5 + 0.5 * sin(c.y * 0.25 + uTime * 0.6), 18.0);
-    vec3 col = mix(uGrid, uStreak, clamp(major * pulse, 0.0, 1.0));
-    float a = (minor * 0.5 + major * 0.9) * uAlpha + major * pulse * 0.35;
+    // flow space: the water drifts towards the viewer as the page scrolls
+    vec2 flow = vec2(vWorld.x, vWorld.z - uScroll * 7.0);
+    float row = flow.y / 0.22;
+    float line = scanline(row);
+    // light catching the water unevenly along each line
+    float shimmer = 0.55 + 0.45 * noise(vec2(flow.x * 0.3 + uTime * 0.06, floor(row) * 1.7));
+    float fog = 1.0 - smoothstep(8.0, 55.0, vDepth);
+    float near = smoothstep(0.8, 3.5, vDepth);
+
+    // surface blooms: a soft glow where the pointer passed, with a ring rippling out from it
+    float bloom = 0.0;
+    for (int i = 0; i < BLOOMS; i++) {
+      vec4 b = uBlooms[i];
+      if (b.w <= 0.0) continue;
+      float d = distance(flow, b.xy);
+      float life = 1.0 - clamp(b.z / LIFE, 0.0, 1.0);
+      float glow = exp(-d * d / 1.1);
+      float ring = exp(-pow((d - b.z * 2.4) / 0.32, 2.0)) * 0.7;
+      bloom += (glow + ring) * life * life * b.w;
+    }
+    bloom = min(bloom, 1.3);
+
+    float a = line * (uAlpha * shimmer * uFade + bloom * 0.75) + bloom * 0.045;
+    vec3 col = mix(uGrid, uStreak, clamp(bloom * 1.3, 0.0, 1.0));
     gl_FragColor = vec4(col, a * fog * near);
   }
 `
@@ -115,32 +150,48 @@ const STREAK_FRAGMENT = /* glsl */ `
   uniform float uTime;
   uniform float uScroll;
   uniform float uIntensity;
+  uniform vec2 uResolution;
   varying vec2 vUv;
   ${NOISE}
 
-  float streak(vec2 uv, float y, float thick, float start, float len, float seed) {
-    float dy = (uv.y - y) / thick;
-    float core = exp(-dy * dy);
-    float glow = exp(-dy * dy * 0.04) * 0.25;
-    float h = smoothstep(start, start + len * 0.35, uv.x) * (1.0 - smoothstep(start + len * 0.8, start + len, uv.x));
-    float grain = 0.55 + 0.45 * noise(vec2(uv.x * 90.0 + seed * 13.0, seed));
-    return (core + glow) * h * grain;
+  // one sleeve streak, measured in CSS pixels: a 2px core, a 14px blurred band and a wide faint glow.
+  // returns (alpha, how white-hot this pixel is)
+  vec2 streak(vec2 px, float y, float start, float len, float coreAmount, float seed) {
+    float dy = px.y - y;
+    float core = exp(-pow(dy / 1.1, 2.0)) * coreAmount;
+    float band = exp(-pow(dy / 7.0, 2.0)) * 0.24;
+    float glow = exp(-pow(dy / 18.0, 2.0)) * 0.08;
+    float x = (px.x - start) / len;
+    float body = smoothstep(0.0, 0.3, x) * (1.0 - smoothstep(0.72, 1.0, x));
+    float grain = 0.72 + 0.28 * noise(vec2(px.x * 0.06 + seed * 13.0, seed));
+    float hot = smoothstep(0.28, 0.52, x) * (1.0 - smoothstep(0.52, 0.76, x));
+    return vec2((core + band + glow) * body * grain, core * body * hot);
   }
 
   void main() {
-    float s = 0.0;
-    for (int i = 0; i < 6; i++) {
+    vec2 px = vUv * uResolution;
+    vec2 s = vec2(0.0);
+    for (int i = 0; i < 5; i++) {
       float fi = float(i);
       float seed = fi * 7.31 + 1.7;
-      float speed = 0.06 + 0.05 * fract(seed * 0.37);
-      float y = fract(0.12 + fi * 0.161 + uScroll * speed + 0.015 * sin(uTime * 0.2 + seed));
-      float thick = 0.0016 + 0.0022 * fract(seed * 0.71);
-      float len = 0.35 + 0.4 * fract(seed * 0.53);
-      float start = -0.2 + 0.7 * fract(seed * 0.29) + 0.12 * sin(uTime * 0.07 + seed);
+      float speed = 0.07 + 0.05 * fract(seed * 0.37);
+      float y = fract(0.14 + fi * 0.197 + uScroll * speed + 0.012 * sin(uTime * 0.2 + seed));
+      float len = (0.38 + 0.36 * fract(seed * 0.53)) * uResolution.x;
+      float start = (-0.15 + 0.7 * fract(seed * 0.29) + 0.1 * sin(uTime * 0.07 + seed)) * uResolution.x;
+      // some streaks are only the blurred band, like light smeared across the fog
+      float coreAmount = step(0.35, fract(seed * 0.61));
       float edgeFade = smoothstep(0.0, 0.08, y) * (1.0 - smoothstep(0.92, 1.0, y));
-      s += streak(vUv, y, thick, start, len, seed) * edgeFade * (0.45 + 0.55 * fract(seed * 0.19));
+      s += streak(px, y * uResolution.y, start, len, coreAmount, seed) * edgeFade * (0.55 + 0.45 * fract(seed * 0.19));
     }
-    gl_FragColor = vec4(uStreak, clamp(s, 0.0, 1.0) * uIntensity);
+
+    // the one vertical amber hairline from the sleeve, belonging to the hero
+    float vx = (0.635 + 0.015 * sin(uTime * 0.05)) * uResolution.x;
+    float vertical = exp(-pow((px.x - vx) / 0.7, 2.0)) * smoothstep(0.04, 0.22, vUv.y) * (1.0 - smoothstep(0.78, 0.94, vUv.y));
+    s.x += vertical * 0.55 * (1.0 - smoothstep(0.2, 0.9, uScroll));
+
+    vec3 hotColour = mix(uStreak, vec3(1.0, 0.9, 0.75), 0.85);
+    vec3 col = mix(uStreak, hotColour, clamp(s.y, 0.0, 1.0));
+    gl_FragColor = vec4(col, clamp(s.x, 0.0, 1.0) * uIntensity);
   }
 `
 
@@ -232,9 +283,10 @@ const Background = ({ theme }: Props) => {
       },
     })
 
-    const grid = new ShaderMaterial({
-      vertexShader: GRID_VERTEX,
-      fragmentShader: GRID_FRAGMENT,
+    const blooms = Array.from({ length: BLOOMS }, () => new Vector4(0, 0, 0, 0))
+    const river = new ShaderMaterial({
+      vertexShader: RIVER_VERTEX,
+      fragmentShader: RIVER_FRAGMENT,
       transparent: true,
       depthTest: false,
       depthWrite: false,
@@ -242,8 +294,10 @@ const Background = ({ theme }: Props) => {
         uGrid: { value: current.grid },
         uStreak: { value: current.streak },
         uAlpha: { value: current.gridAlpha },
+        uFade: { value: 1 },
         uScroll: { value: 0 },
         uTime: { value: 0 },
+        uBlooms: { value: blooms },
       },
     })
 
@@ -258,24 +312,28 @@ const Background = ({ theme }: Props) => {
         uTime: { value: 0 },
         uScroll: { value: 0 },
         uIntensity: { value: current.streakAlpha },
+        uResolution: { value: new Vector2(1, 1) },
       },
     })
 
-    const floorGeometry = new PlaneGeometry(200, 200, 160, 160)
-    floorGeometry.rotateX(-Math.PI / 2)
-    const floor = new Mesh(floorGeometry, grid)
-    floor.position.z = -50
-    floor.renderOrder = 1
-    scene.add(screenQuad(mist, 0), floor, screenQuad(streaks, 2))
+    const waterGeometry = new PlaneGeometry(200, 200, 160, 160)
+    waterGeometry.rotateX(-Math.PI / 2)
+    const water = new Mesh(waterGeometry, river)
+    water.position.z = -50
+    water.renderOrder = 1
+    scene.add(screenQuad(mist, 0), water, screenQuad(streaks, 2))
 
     const lookAt = new Vector3()
     const horizonPoint = new Vector3()
+    const ray = new Vector3()
     const pointer = { x: 0, y: 0, tx: 0, ty: 0 }
     let scroll = window.scrollY / window.innerHeight
     // with reduced motion the scene is a still image, with a fixed time picked for a pleasant layout
     let time = 12
     let last = performance.now()
     let frame = 0
+    let nextBloom = 0
+    let lastBloom: { x: number; y: number; at: number } | null = null
 
     const render = () => {
       const s = Math.min(scroll, 3)
@@ -283,19 +341,23 @@ const Background = ({ theme }: Props) => {
       lookAt.set(pointer.x * 0.4, 0.2 - s * 0.9, -30)
       camera.lookAt(lookAt)
       camera.updateMatrixWorld()
-      // where the (infinitely far) floor meets the sky on screen, for the mist band
+      // where the (infinitely far) water meets the sky on screen, for the mist band
       horizonPoint.set(camera.position.x, 0, camera.position.z - 5000).project(camera)
       mist.uniforms.uHorizon.value = horizonPoint.y * 0.5 + 0.5
+
+      // the river belongs to the hero; below it only the faintest water stays behind the text
+      const fade = 1 - 0.78 * Math.min(Math.max((scroll - 0.6) / 0.8, 0), 1)
 
       mist.uniforms.uTime.value = time
       mist.uniforms.uScroll.value = scroll
       mist.uniforms.uFog.value = current.fog
-      grid.uniforms.uTime.value = time
-      grid.uniforms.uScroll.value = scroll
-      grid.uniforms.uAlpha.value = current.gridAlpha
+      river.uniforms.uTime.value = time
+      river.uniforms.uScroll.value = scroll
+      river.uniforms.uAlpha.value = current.gridAlpha
+      river.uniforms.uFade.value = fade
       streaks.uniforms.uTime.value = time
       streaks.uniforms.uScroll.value = scroll
-      streaks.uniforms.uIntensity.value = current.streakAlpha
+      streaks.uniforms.uIntensity.value = current.streakAlpha * (0.6 + 0.4 * fade)
       renderer.render(scene, camera)
     }
 
@@ -310,6 +372,27 @@ const Background = ({ theme }: Props) => {
       current.fog += (t.fog - current.fog) * k
     }
 
+    // project the pointer onto the water and drop a bloom there, in flow space so it drifts with the river
+    const bloomAt = (clientX: number, clientY: number) => {
+      const { clientWidth: w, clientHeight: h } = canvas
+      ray
+        .set((clientX / w) * 2 - 1, -(clientY / h) * 2 + 1, 0.5)
+        .unproject(camera)
+        .sub(camera.position)
+      if (ray.y >= -1e-4) return // above the horizon, nothing to touch
+      const t = -camera.position.y / ray.y
+      const x = camera.position.x + ray.x * t
+      const z = camera.position.z + ray.z * t
+      if (z < -60) return // too far into the fog to see
+      const flowY = z - scroll * 7
+      const now = performance.now()
+      // space blooms out so a fast swipe leaves a trail rather than one blob
+      if (lastBloom && now - lastBloom.at < 90 && Math.hypot(x - lastBloom.x, flowY - lastBloom.y) < 0.45) return
+      blooms[nextBloom].set(x, flowY, 0, 1)
+      nextBloom = (nextBloom + 1) % BLOOMS
+      lastBloom = { x, y: flowY, at: now }
+    }
+
     const tick = (now: number) => {
       frame = requestAnimationFrame(tick)
       // frame rate independent easing, capped so a long pause does not jump
@@ -320,6 +403,11 @@ const Background = ({ theme }: Props) => {
       scroll += (window.scrollY / window.innerHeight - scroll) * ease
       pointer.x += (pointer.tx - pointer.x) * ease * 0.6
       pointer.y += (pointer.ty - pointer.y) * ease * 0.6
+      blooms.forEach((b) => {
+        if (b.w <= 0) return
+        b.z += dt
+        if (b.z > BLOOM_LIFE) b.w = 0
+      })
       approach(1 - Math.exp(-dt * 3))
       render()
     }
@@ -342,19 +430,26 @@ const Background = ({ theme }: Props) => {
       camera.aspect = w / h
       camera.updateProjectionMatrix()
       mist.uniforms.uAspect.value = w / h
+      streaks.uniforms.uResolution.value.set(w, h)
       if (!frame) render()
     }
     const observer = new ResizeObserver(resize)
     observer.observe(canvas)
     resize()
 
+    const finePointer = window.matchMedia('(pointer: fine)').matches
     const onPointer = (event: PointerEvent) => {
-      pointer.tx = (event.clientX / window.innerWidth) * 2 - 1
-      pointer.ty = -((event.clientY / window.innerHeight) * 2 - 1)
+      if (finePointer) {
+        pointer.tx = (event.clientX / window.innerWidth) * 2 - 1
+        pointer.ty = -((event.clientY / window.innerHeight) * 2 - 1)
+      }
+      bloomAt(event.clientX, event.clientY)
     }
     const onVisibility = () => (document.hidden ? stop() : start())
-    const finePointer = window.matchMedia('(pointer: fine)').matches
-    if (finePointer && !reducedMotion) window.addEventListener('pointermove', onPointer, { passive: true })
+    if (!reducedMotion) {
+      window.addEventListener('pointermove', onPointer, { passive: true })
+      window.addEventListener('pointerdown', onPointer, { passive: true })
+    }
     document.addEventListener('visibilitychange', onVisibility)
 
     paletteRef.current = {
@@ -376,12 +471,13 @@ const Background = ({ theme }: Props) => {
       stop()
       observer.disconnect()
       window.removeEventListener('pointermove', onPointer)
+      window.removeEventListener('pointerdown', onPointer)
       document.removeEventListener('visibilitychange', onVisibility)
       scene.traverse((object) => {
         if (object instanceof Mesh) object.geometry.dispose()
       })
       mist.dispose()
-      grid.dispose()
+      river.dispose()
       streaks.dispose()
       renderer.dispose()
       paletteRef.current = null

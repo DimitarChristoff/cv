@@ -56,7 +56,9 @@ type Props = ThemeSwitchProps
 const Nav = ({ theme, onChange }: Props) => {
   const navRef = useRef<HTMLElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const [active, setActive] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
 
   useEffect(
     () =>
@@ -88,8 +90,37 @@ const Nav = ({ theme, onChange }: Props) => {
     return () => observer.disconnect()
   }, [])
 
+  // the phone menu closes on Escape (returning focus to its button) and on any tap outside the bar
+  useEffect(() => {
+    if (!open) return
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    const onPointer = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    document.addEventListener('pointerdown', onPointer)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('pointerdown', onPointer)
+    }
+  }, [open])
+
+  const links = (onClick?: () => void) =>
+    SECTIONS.map(({ id, label }) => (
+      <li key={id}>
+        <a href={`#${id}`} className="nav__link" aria-current={active === id ? 'true' : undefined} onClick={onClick}>
+          {label}
+        </a>
+      </li>
+    ))
+
   return (
-    <header className="nav" ref={navRef}>
+    <header className={open ? 'nav is-open' : 'nav'} ref={navRef}>
       <div className="nav__inner">
         <a href="#top" className="nav__brand">
           <span className="nav__mark" aria-hidden="true">
@@ -99,16 +130,26 @@ const Nav = ({ theme, onChange }: Props) => {
             {profile.first} {profile.last}
           </span>
         </a>
+        <nav aria-label="Sections" className="nav__sections">
+          <ul className="nav__links">{links()}</ul>
+        </nav>
+        <div className="nav__themes">
+          <ThemeSwitch theme={theme} onChange={onChange} />
+        </div>
+        <button
+          type="button"
+          className="nav__menu"
+          ref={menuButtonRef}
+          aria-expanded={open}
+          aria-controls="nav-panel"
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          onClick={() => setOpen((value) => !value)}>
+          <span className="nav__burger" aria-hidden="true" />
+        </button>
+      </div>
+      <div id="nav-panel" className="nav__panel" hidden={!open}>
         <nav aria-label="Sections">
-          <ul className="nav__links">
-            {SECTIONS.map(({ id, label }) => (
-              <li key={id}>
-                <a href={`#${id}`} className="nav__link" aria-current={active === id ? 'true' : undefined}>
-                  {label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <ul className="nav__panel-links">{links(() => setOpen(false))}</ul>
         </nav>
         <ThemeSwitch theme={theme} onChange={onChange} />
       </div>
