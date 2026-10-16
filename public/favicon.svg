@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    ellipse { stroke: #2e3c4b; }
+    text { fill: #2e3c4b; }
+    @media (prefers-color-scheme: dark) {
+      ellipse { stroke: #e8e6e0; }
+      text { fill: #e8e6e0; }
+    }
+  </style>
+  <ellipse cx="32" cy="32" rx="29" ry="19" fill="none" stroke-width="4" />
+  <text x="32" y="40" font-family="Futura, 'Century Gothic', Arial, sans-serif" font-size="22" font-weight="700" text-anchor="middle">DC</text>
+  <circle cx="54" cy="14" r="5" fill="#e8a33a" />
+</svg>

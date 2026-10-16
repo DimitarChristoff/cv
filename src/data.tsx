@@ -1,17 +1,17 @@
-import React from 'react'
-import { JobType } from './types'
-import { Link } from '@mui/material'
+import { Award, EducationType, JobType, SkillGroup } from './types'
 
 export const jobs: JobType[] = [
   {
     client: 'Market Axess',
+    short: 'MarketAxess',
     role: 'Lead Software Engineer',
     location: 'London',
     from: 'Jun 2024',
     until: 'date',
-    description: `Working as Lead on the platform team for MarketAxess. Huge monorepo running platform as a service on top of: pnpm,
-    TypesScript, rtk, node, GraphQL, Yoga, Tailwind, ShadCN, ag-grid, MicroFrontends and much more. Responsible for helping build the
-    next generation of platform for the Market Axess trading platform`,
+    description: `Lead on the platform team, leading the digital transformation at MarketAxess and building the OpenFin
+    desktop platform for X-Pro 2.0, the next generation of the MarketAxess trading platform. Huge monorepo running platform
+    as a service on top of: pnpm, TypeScript, rtk, node, GraphQL, Yoga, Tailwind, ShadCN, ag-grid, OpenFin, MicroFrontends
+    and much more.`,
   },
 
   {
@@ -24,6 +24,7 @@ export const jobs: JobType[] = [
     jobs: [
       {
         client: 'HSBC Fixed Income / GDM, Falcon',
+        short: 'HSBC',
         from: 'Sep 2021',
         until: 'date',
         description: `Lead Front-end Developer on all Fixed Income risk apps (credit and rates), one of 5 UI platform
@@ -39,17 +40,18 @@ export const jobs: JobType[] = [
       },
       {
         client: 'GenesisGlobal',
+        short: 'Genesis Global',
         from: 'Oct 2020',
         until: 'Sep 2021',
         description: (
           <>
-            JavaScript developer / lead, initially working on Genesis' web components 'low code' platform for capital
-            markets. Subsequently, extended to created two apps that allow users to make applications using a web
-            interface without having to write code. Utilised json-schema, custom-elements.json and jsdoc to annotate
-            both components and server-side standards and built a React redux app that{' '}
-            <Link href="https://www.normanandsons.com/videos/IKZEOKR9YA.mp4">
+            JavaScript developer / lead, initially working on Genesis&apos; web components &apos;low code&apos; platform
+            for capital markets. Subsequently, extended to created two apps that allow users to make applications using
+            a web interface without having to write code. Utilised json-schema, custom-elements.json and jsdoc to
+            annotate both components and server-side standards and built a React redux app that{' '}
+            <a className="link" href="https://www.normanandsons.com/videos/IKZEOKR9YA.mp4">
               generated JSX code and managed projects
-            </Link>{' '}
+            </a>{' '}
             in a WYSIWYG manner. Also used: BlueprintJs, react-flow, react-beautiful-dnd, styled-components, CSSNext,
             SCSS. Both server and client counterpart apps were completed within 6 months to a MVP standard to help
             Genesis offer low/no code solutions for server and client spaces.
@@ -77,6 +79,7 @@ export const jobs: JobType[] = [
   },
   {
     client: 'GFT - Liquidnet',
+    short: 'Liquidnet',
     role: 'Frontend Lead, GIN IA',
     location: 'London',
     from: 'Jun 2019',
@@ -177,6 +180,7 @@ export const jobs: JobType[] = [
   },
   {
     client: 'J.P. Morgan, Chase & Co (JPMC)',
+    short: 'J.P. Morgan',
     role: 'Senior JavaScript Engineer',
     from: 'Apr 2014',
     until: 'Dec 2014',
@@ -249,4 +253,157 @@ export const jobs: JobType[] = [
       },
     ],
   },
+]
+
+export const profile = {
+  first: 'Dimitar',
+  last: 'Christoff',
+  title: 'Lead Software Engineer',
+  location: 'London',
+  email: 'christoff@gmail.com',
+  phone: '07810072094',
+  address: ['Flat 4, 85 Cleveland Road', 'London W13 0HF'],
+  github: { handle: 'dimitarchristoff', url: 'https://github.com/DimitarChristoff?tab=repositories' },
+  stackoverflow: 'http://stackoverflow.com/users/126998/dimitar-christoff',
+}
+
+const skill = (name: string, core = false) => ({ name, core })
+
+export const skills: SkillGroup[] = [
+  {
+    title: 'Programming',
+    items: ['JavaScript', 'TypeScript', 'ES2015 - ESNext', 'CSS3', 'HTML5', 'JSX / TSX'].map((name) =>
+      skill(name, true),
+    ),
+  },
+  {
+    title: 'AI',
+    items: [
+      skill('Agentic coding', true),
+      skill('Claude w/ MCP', true),
+      skill('GitHub Copilot', true),
+      skill('Orca'),
+      skill('TypeSafe AI (Jeb)'),
+      skill('OpenAI models'),
+    ],
+  },
+  {
+    title: 'Toolkits / Frameworks',
+    items: [
+      skill('React', true),
+      skill('node.js'),
+      skill('Webpack', true),
+      skill('Vite', true),
+      skill('Astro', true),
+      skill('Redux', true),
+      skill('MobX', true),
+      skill('rx.js'),
+      skill('GraphQL'),
+      skill('Yoga'),
+      skill('Apollo'),
+      skill('Jest', true),
+      skill('Vitest', true),
+      skill('React Testing Library', true),
+      skill('React Router', true),
+      skill('Lerna'),
+      skill('pnpm', true),
+      skill('Cypress', true),
+      skill('Playwright', true),
+      skill('Backstop.js', true),
+      skill('Enzyme'),
+      skill('Nightwatch'),
+      skill('MUI', true),
+      skill('Mantine', true),
+      skill('ShadCN', true),
+      skill('OpenFin', true),
+      skill('Blueprint.js', true),
+      skill('Stencil', true),
+      skill('AngularJS 1/2'),
+      skill('Backbone'),
+      skill('Carbon UI'),
+      skill('CSS / Tailwind', true),
+      skill('Bulma', true),
+      skill('LESS', true),
+      skill('SASS/SCSS', true),
+      skill('CSSNext/PostCSS', true),
+      skill('MooTools', true),
+      skill('jQuery', true),
+      skill('Highcharts'),
+      skill('ChartJS'),
+      skill('AG Grid', true),
+      skill('SlickGrid', true),
+      skill('socket.io', true),
+    ],
+  },
+  {
+    title: 'Platforms / Software tools',
+    items: [
+      skill('git', true),
+      skill('WebStorm / IntelliJ Idea', true),
+      skill('GCP'),
+      skill('docker'),
+      skill('devcontainer'),
+      skill('Earthly'),
+      skill('GitHub / workflows', true),
+      skill('GitLab CI', true),
+      skill('ADO', true),
+      skill('bash/zsh'),
+      skill('OSX'),
+      skill('CentOS / RedHat'),
+    ],
+  },
+  {
+    title: 'Design / Visual',
+    items: [
+      skill('Figma', true),
+      skill('DaVinci Resolve', true),
+      skill('Corel Draw', true),
+      skill('Corel Photopaint', true),
+      skill('Fireworks'),
+      skill('PhotoShop'),
+    ],
+  },
+]
+
+export const education: EducationType[] = [
+  {
+    title: 'BA International Economic Relations',
+    school: 'National University of Economics',
+    location: 'Sofia, Bulgaria',
+    from: 'Sep 1993',
+    until: 'Jul 1995',
+    note: 'Dropped out final year due to move to UK',
+  },
+  {
+    title: 'A Level equivalences (x4)',
+    school: '7th Secondary School (SOU)',
+    location: 'Sofia, Bulgaria',
+    from: 'Sep 1989',
+    until: 'Jul 1993',
+  },
+]
+
+export const interests = [
+  'Avid tennis player, member of a West Middlesex Tennis club team',
+  'Dancing Salsa and Bachata',
+  'Fanatical about skiing',
+]
+
+export const community = [
+  <>
+    Help / contribute on various JavaScript support sites like{' '}
+    <a className="link" href="http://stackoverflow.com/users/126998/dimitar-christoff">
+      stackoverflow.com
+    </a>
+    , top 2%
+  </>,
+  'Created MVC framework Epitome for MooTools, featured on todomvc.com as alternative to BackboneJS',
+  'Contributor to various open source JavaScript libraries, including MooTools, RequireJS, angular/ng-grid, twitter/recess, fixed-data-table, react, etc',
+]
+
+export const awards: Award[] = [
+  { year: '2009', text: `Walk Magazine readers' award Best Online Retailer, webtogs.co.uk` },
+  { year: '2008', text: `UK Webmaster World – Best Website Award for August '08, webtogs.co.uk` },
+  { year: '2003', text: 'CNET Best of the web & Golden Web awards, frugalsworld.com' },
+  { year: '1994', text: 'PC World Bulgaria – Winner of National Programming Competition (Pascal + ASM)' },
 ]

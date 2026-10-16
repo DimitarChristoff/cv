@@ -1,93 +1,51 @@
-import React, { FC } from 'react'
-import { Card, CardHeader, CardContent, Chip } from '@mui/material'
+import { useState } from 'react'
+import Section from './Section'
+import { skills } from './data'
 
-export const Skills: FC = () => {
+const Skills = () => {
+  const [coreOnly, setCoreOnly] = useState(false)
+  const total = skills.reduce((sum, group) => sum + group.items.length, 0)
+
   return (
-    <>
-      <Card sx={{ marginBottom: 2, padding: 0 }}>
-        <CardHeader title={'Programming'} />
-        <CardContent sx={{ margin: 0, paddingTop: 0 }}>
-          <Chip color={'success'} size={'small'} label={'JavaScript'} />
-          <Chip color={'success'} size={'small'} label={'TypeScript'} />
-          <Chip color={'success'} size={'small'} label={'ES2015 - ES2022'} />
-          <Chip color={'success'} size={'small'} label={'CSS3'} />
-          <Chip color={'success'} size={'small'} label={'HTML5'} />
-          <Chip color={'success'} size={'small'} label={'JSX / TSX'} />
-        </CardContent>
-      </Card>
-      <Card sx={{ marginBottom: 2, padding: 0 }}>
-        <CardHeader title={'Toolkits / Frameworks'} />
-        <CardContent sx={{ margin: 0, paddingTop: 0 }}>
-          <Chip color={'success'} size={'small'} label={'React'} />
-          <Chip size={'small'} label={'node.js'} />
-          <Chip color={'success'} size={'small'} label={'Webpack'} />
-          <Chip color={'success'} size={'small'} label={'Vite'} />
-          <Chip color={'success'} size={'small'} label={'Astro'} />
-          <Chip color={'success'} size={'small'} label={'Redux'} />
-          <Chip color={'success'} size={'small'} label={'MobX'} />
-          <Chip size={'small'} label={'rx.js'} />
-          <Chip size={'small'} label={'GraphQL'} />
-          <Chip size={'small'} label={'Yoga'} />
-          <Chip size={'small'} label={'Apollo'} />
-          <Chip color={'success'} size={'small'} label={'Jest'} />
-          <Chip color={'success'} size={'small'} label={'Vitest'} />
-          <Chip color={'success'} size={'small'} label={'React Testing Library'} />
-          <Chip color={'success'} size={'small'} label={'React Router'} />
-          <Chip size={'small'} label={'Lerna'} />
-          <Chip color={'success'} size={'small'} label={'pnpm'} />
-          <Chip color={'success'} size={'small'} label={'Cypress'} />
-          <Chip color={'success'} size={'small'} label={'Playwright'} />
-          <Chip color={'success'} size={'small'} label={'Backstop.js'} />
-          <Chip size={'small'} label={'Enzyme'} />
-          <Chip size={'small'} label={'Nightwatch'} />
-          <Chip color={'success'} size={'small'} label={'MUI'} />
-          <Chip color={'success'} size={'small'} label={'ShadCN'} />
-          <Chip color={'success'} size={'small'} label={'Blueprint.js'} />
-          <Chip color={'success'} size={'small'} label={'Stencil'} />
-          <Chip size={'small'} label={'AngularJS 1/2'} />
-          <Chip size={'small'} label={'Backbone'} />
-          <Chip size={'small'} label={'Carbon UI'} />
-          <Chip color={'success'} size={'small'} label={'CSS / Tailwind'} />
-          <Chip color={'success'} size={'small'} label={'Bulma'} />
-          <Chip color={'success'} size={'small'} label={'LESS'} />
-          <Chip color={'success'} size={'small'} label={'SASS/SCSS'} />
-          <Chip color={'success'} size={'small'} label={'CSSNext/PostCSS'} />
-          <Chip color={'success'} size={'small'} label={'MooTools'} />
-          <Chip color={'success'} size={'small'} label={'jQuery'} />
-          <Chip size={'small'} label={'Highcharts'} />
-          <Chip size={'small'} label={'ChartJS'} />
-          <Chip color={'success'} size={'small'} label={'AG Grid'} />
-          <Chip color={'success'} size={'small'} label={'SlickGrid'} />
-          <Chip color={'success'} size={'small'} label={'socket.io'} />
-        </CardContent>
-      </Card>{' '}
-      <Card sx={{ marginBottom: 2, padding: 0 }}>
-        <CardHeader title={'Platforms / Software tools'} />
-        <CardContent sx={{ margin: 0, paddingTop: 0 }}>
-          <Chip color={'success'} size={'small'} label={'git'} />
-          <Chip color={'success'} size={'small'} label={'WebStorm / IntelliJ Idea'} />
-          <Chip size={'small'} label={'GCP'} />
-          <Chip size={'small'} label={'docker'} />
-          <Chip size={'small'} label={'devcontainer'} />
-          <Chip size={'small'} label={'Earthly'} />
-          <Chip color={'success'} size={'small'} label={'GitLab CI'} />
-          <Chip color={'success'} size={'small'} label={'ADO'} />
-          <Chip size={'small'} label={'bash/zsh'} />
-          <Chip size={'small'} label={'OSX'} />
-          <Chip size={'small'} label={'CentOS / RedHat'} />
-          <Chip color={'success'} size={'small'} label={'Claude w/ MCP'} />
-        </CardContent>
-      </Card>
-      <Card sx={{ marginBottom: 2, padding: 0 }}>
-        <CardHeader title={'Design / Visual'} />
-        <CardContent sx={{ margin: 0, paddingTop: 0 }}>
-          <Chip color={'success'} size={'small'} label={'DaVinci Resolve'} />
-          <Chip color={'success'} size={'small'} label={'Corel Draw'} />
-          <Chip color={'success'} size={'small'} label={'Corel Photopaint'} />
-          <Chip size={'small'} label={'Fireworks'} />
-          <Chip size={'small'} label={'PhotoShop'} />
-        </CardContent>
-      </Card>
-    </>
+    <Section id="skills" index="02" title="Skills" aside={`${total} tools`}>
+      <div className="skills__bar" data-reveal>
+        <p className="legend">
+          <span className="legend__dot" aria-hidden="true" /> Higher proficiency — experience with all of them
+        </p>
+        <div className="segmented no-print" role="group" aria-label="Filter skills">
+          <button type="button" aria-pressed={!coreOnly} onClick={() => setCoreOnly(false)}>
+            All
+          </button>
+          <button type="button" aria-pressed={coreOnly} onClick={() => setCoreOnly(true)}>
+            Core
+          </button>
+        </div>
+      </div>
+      <div className="skills__grid">
+        {skills.map((group) => {
+          const items = coreOnly ? group.items.filter((s) => s.core) : group.items
+          return (
+            <div
+              key={group.title}
+              className={`skill-group card${group.items.length > 20 ? ' skill-group--wide' : ''}`}
+              data-reveal>
+              <h3 className="skill-group__title">
+                {group.title}
+                <span>{items.length}</span>
+              </h3>
+              <ul className="pills">
+                {items.map((s) => (
+                  <li key={s.name} className={s.core ? 'pill pill--core' : 'pill'}>
+                    {s.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        })}
+      </div>
+    </Section>
   )
 }
+
+export default Skills

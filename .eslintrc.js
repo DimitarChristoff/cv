@@ -3,6 +3,7 @@ module.exports = {
     // By extending from a plugin config, we can get recommended rules without having to add them manually.
     'eslint:recommended',
     'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
     'plugin:import/recommended',
     'plugin:jsx-a11y/recommended',
     'plugin:@typescript-eslint/recommended',
@@ -51,7 +52,8 @@ module.exports = {
     'no-shadow-restricted-names': 0,
     'no-plusplus': 0,
     'no-console': 0,
-    'no-unused-vars': 1,
+    'no-unused-vars': 0,
+    '@typescript-eslint/no-unused-vars': 1,
     'no-unused-expressions': 0,
     'no-return-assign': 0,
     'no-alert': 0,

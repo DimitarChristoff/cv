@@ -1,40 +1,18 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { ThemeProvider, createTheme } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import '@fontsource-variable/geist'
+import '@fontsource-variable/geist-mono'
+import '@fontsource-variable/jost'
+import '@fontsource-variable/doto'
 import App from './App'
 import './index.css'
 
-const themeOptions = {
-  palette: {
-    type: 'dark',
-    primary: {
-      main: '#d6a200',
-    },
-    secondary: {
-      main: '#2266af',
-    },
-    background: {
-      default: '#1c1b1b',
-      paper: 'rgba(30,30,30,0.72)',
-    },
-    text: {
-      primary: '#ffecb3',
-      secondary: '#ad7e0f',
-    },
-  },
-  typography: {
-    fontSize: 12,
-  },
-}
-const darkTheme = createTheme(themeOptions)
+const root = document.getElementById('root')
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
+if (root) {
+  createRoot(root).render(
+    <StrictMode>
       <App />
-      <div className="personal-bg" />
-    </ThemeProvider>
-  </React.StrictMode>,
-)
+    </StrictMode>,
+  )
+}

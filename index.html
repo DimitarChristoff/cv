@@ -3,7 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Dimitar Christoff — Lead Software Engineer, London. JavaScript, TypeScript, React, performance." />
+    <meta name="theme-color" content="#f3f3f1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Dimitar Christoff: Curriculum Vitae</title>
+    <script>
+      // apply the saved theme before first paint so there is no flash
+      ;(function () {
+        var themes = ['tourist', 'mist', 'sage', 'lilac', 'nocturne']
+        var theme = 'tourist'
+        try {
+          var saved = localStorage.getItem('cv-theme')
+          if (themes.indexOf(saved) > -1) theme = saved
+          else if (window.matchMedia('(prefers-color-scheme: dark)').matches) theme = 'nocturne'
+        } catch (e) {}
+        document.documentElement.dataset.theme = theme
+        document.documentElement.classList.add('js')
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>
